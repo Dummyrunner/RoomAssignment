@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Pytest",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest", // Use pytest as the module to run
+            "args": [
+                "test" // Specify the test directory
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "python": "C:/Users/HP/miniconda3/envs/rooms/python.exe" // Path to the Conda environment's Python interpreter
+        }
+    ]
+}
