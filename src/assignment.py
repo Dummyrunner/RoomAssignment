@@ -46,4 +46,16 @@ class Assignment:
         ):
             return False
 
+        # Check that the number of persons assigned to a room does not exceed its capacity
+        room_capacity = {room.name: room.capacity for room in self.room_config.rooms}
+        room_assignments = {room: 0 for room in valid_rooms}
+        for room in self.assignment_map.values():
+            if room:
+                room_assignments[room] += 1
+
+        if any(
+            room_assignments[room] > room_capacity[room] for room in room_assignments
+        ):
+            return False
+
         return True

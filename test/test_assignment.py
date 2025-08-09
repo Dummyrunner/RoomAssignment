@@ -53,3 +53,18 @@ def test_get_room_for_person():
 
     with pytest.raises(ValueError):
         assignment.get_room_for_person(Person("Nonexistent", "Person"))  # Not in map
+
+
+def test_assignment_exceeds_room_capacity():
+    candidates = CleaningCandidates(
+        [Person("John", "Doe"), Person("Jane", "Smith"), Person("Alice", "Johnson")]
+    )
+    room_config = RoomConfig()
+    room_config.add_room(Room("Room A", 2))  # Capacity of 2
+
+    assignment = Assignment(candidates, room_config)
+    assignment.assign(candidates.candidates[0], "Room A")
+    assignment.assign(candidates.candidates[1], "Room A")
+    assignment.assign(candidates.candidates[2], "Room A")  # Exceeds capacity
+
+    assert assignment.valid() is False
