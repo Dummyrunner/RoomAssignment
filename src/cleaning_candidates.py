@@ -42,6 +42,7 @@ class CleaningCandidates:
             {"first_name": person.first_name, "last_name": person.last_name}
             for person in self.candidates
         ]
+        candidate_data.append({"hash": self.generate_hash()})
         with open(filepath, "w") as file:
             json.dump(candidate_data, file, indent=4)
 

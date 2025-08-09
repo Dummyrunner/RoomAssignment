@@ -35,3 +35,11 @@ class RoomConfig:
         with open(filepath, "r") as file:
             data = json.load(file)
         self.read_from_dict(data)
+
+    def write_to_file(self, filepath: str):
+        room_data = [
+            {"name": room.name, "capacity": room.capacity} for room in self.rooms
+        ]
+        room_data.append({"hash": self.generate_hash()})
+        with open(filepath, "w") as file:
+            json.dump(room_data, file, indent=4)

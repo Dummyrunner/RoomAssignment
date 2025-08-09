@@ -5,6 +5,7 @@ from src.room_config import RoomConfig
 from src.room import Room
 from src.person import Person
 from math import factorial
+from src.assignment import Assignment
 
 
 def test_get_valid_assignments():
@@ -14,7 +15,7 @@ def test_get_valid_assignments():
     room_config.add_room(Room("Room B", 1))
 
     creator = AssignmentCreator(candidates, room_config)
-    valid_assignments = creator.get_valid_assignments()
+    valid_assignments = creator.get_all_valid_assignments()
 
     # Ensure all assignments are valid
     for assignment in valid_assignments:
@@ -35,7 +36,7 @@ def test_get_valid_assignments_with_extra_candidates():
     room_config.add_room(Room("Room B", 1))  # Total capacity = 2
 
     creator = AssignmentCreator(candidates, room_config)
-    valid_assignments = creator.get_valid_assignments()
+    valid_assignments = creator.get_all_valid_assignments()
 
     # Ensure all assignments are valid
     for assignment in valid_assignments:
@@ -60,7 +61,7 @@ def test_get_valid_assignments_with_two_extra_candidates():
     room_config.add_room(Room("Room B", 1))  # Total capacity = 2
 
     creator = AssignmentCreator(candidates, room_config)
-    valid_assignments = creator.get_valid_assignments()
+    valid_assignments = creator.get_all_valid_assignments()
 
     # Ensure all assignments are valid
     for assignment in valid_assignments:
@@ -69,3 +70,18 @@ def test_get_valid_assignments_with_two_extra_candidates():
     # Ensure the number of valid assignments matches expectations
     # 4 candidates, 2 rooms, 2 "None" (unassigned) -> permutations of 4 items
     assert len(valid_assignments) == factorial(4)  # 4! = 24 permutations
+
+
+def test_get_random_valid_assignment():
+    candidates = CleaningCandidates([Person("John", "Doe"), Person("Jane", "Smith")])
+    room_config = RoomConfig()
+    room_config.add_room(Room("Room A", 1))
+    room_config.add_room(Room("Room B", 1))
+
+    creator = AssignmentCreator(candidates, room_config)
+    random_assignment = creator.get_random_valid_assignment()
+
+    # Ensure the random assignment is valid
+    assert random_assignment is not None
+    assert isinstance(random_assignment, Assignment)
+    assert random_assignment.valid()

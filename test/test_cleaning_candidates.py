@@ -79,7 +79,8 @@ def test_write_to_file(tmp_path):
     with open(file_path, "r") as file:
         data = json.load(file)
 
-    assert len(data) == 2
+    # 2 elements and 1 hash
+    assert len(data) == 2 + 1
     assert data[0]["first_name"] == "John"
     assert data[0]["last_name"] == "Doe"
     assert data[1]["first_name"] == "Jane"

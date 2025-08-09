@@ -1,4 +1,5 @@
 from itertools import permutations
+import random
 from src.assignment import Assignment
 from src.cleaning_candidates import CleaningCandidates
 from src.room_config import RoomConfig
@@ -12,7 +13,7 @@ class AssignmentCreator:
         self.cleaning_candidates = cleaning_candidates
         self.room_config = room_config
 
-    def get_valid_assignments(self):
+    def get_all_valid_assignments(self):
         valid_assignments = []
         room_names = [room.name for room in self.room_config.rooms]
 
@@ -29,3 +30,9 @@ class AssignmentCreator:
                 valid_assignments.append(assignment)
 
         return valid_assignments
+
+    def get_random_valid_assignment(self):
+        all_assignments = self.get_all_valid_assignments()
+        if not all_assignments:
+            return None
+        return random.choice(all_assignments)
