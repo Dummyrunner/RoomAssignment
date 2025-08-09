@@ -1,5 +1,6 @@
 import os
 import pytest
+import json
 from src.room import Room
 from src.room_config import RoomConfig
 
@@ -46,3 +47,34 @@ def test_room_config_hash_order_independence():
     config2.add_room(Room("Room A", 10))
 
     assert config1.generate_hash() == config2.generate_hash()
+
+
+def test_remove_room():
+    config = RoomConfig()
+    config.add_room(Room("Room A", 10))
+    config.add_room(Room("Room B", 5))
+    config.remove_room("Room A")
+    assert len(config.rooms) == 1
+    assert config.rooms[0].name == "Room B"
+
+
+def test_read_from_dict():
+    config = RoomConfig()
+    data = [{"name": "Room A", "capacity": 10}, {"name": "Room B", "capacity": 5}]
+    config.read_from_dict(data)
+    assert len(config.rooms) == 2
+    assert config.rooms[0].name == "Room A"
+    assert config.rooms[1].capacity == 5
+
+
+def test_read_from_file(tmp_path):
+    config = RoomConfig()
+    data = [{"name": "Room A", "capacity": 10}, {"name": "Room B", "capacity": 5}]
+    file_path = tmp_path / "room_config.json"
+    with open(file_path, "w") as file:
+        json.dump(data, file)
+
+    config.read_from_file(file_path)
+    assert len(config.rooms) == 2
+    assert config.rooms[0].name == "Room A"
+    assert config.rooms[1].capacity == 5
