@@ -4,7 +4,6 @@ from src.cleaning_candidates import CleaningCandidates
 from src.room_config import RoomConfig
 from src.room import Room
 from src.person import Person
-from src.common_constants import UNASSIGNED_ROOM_NAME
 
 
 def test_assignment_valid():
