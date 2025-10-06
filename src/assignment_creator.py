@@ -1,34 +1,37 @@
 from itertools import permutations
 import random
 from src.assignment import Assignment
-from src.cleaning_candidates import CleaningCandidates
+from src.available_persons import AvailablePersons
 from src.room_config import RoomConfig
 from src.person import Person
 
 
 class AssignmentCreator:
-    def __init__(
-        self, cleaning_candidates: CleaningCandidates, room_config: RoomConfig
-    ):
+    def __init__(self, cleaning_candidates: AvailablePersons, room_config: RoomConfig):
         self.cleaning_candidates = cleaning_candidates
         self.room_config = room_config
 
     def get_all_valid_assignments(self):
-        valid_assignments = []
-        room_names = [room.name for room in self.room_config.rooms]
+        from itertools import permutations
 
-        # Generate all possible assignments of candidates to rooms
-        for perm in permutations(
-            room_names
-            + [None] * (len(self.cleaning_candidates.candidates) - len(room_names))
-        ):
+        valid_assignments = []
+        candidates = self.cleaning_candidates.candidates
+        rooms = self.room_config.rooms
+        room_slots = []
+        for room in rooms:
+            room_slots.extend([room.name] * room.capacity)
+        # If there are more candidates than slots, raise an error
+        if len(candidates) > len(room_slots):
+            raise ValueError("Not enough room slots for all candidates.")
+        # Add None slots for unassigned candidates (not needed anymore)
+        slots = room_slots
+        for perm in set(permutations(slots, len(candidates))):
             assignment = Assignment(self.cleaning_candidates, self.room_config)
-            for person, room_name in zip(self.cleaning_candidates.candidates, perm):
+            for person, room_name in zip(candidates, perm):
                 if room_name:
                     assignment.assign(person, room_name)
             if assignment.valid():
                 valid_assignments.append(assignment)
-
         return valid_assignments
 
     def get_random_valid_assignment(self):

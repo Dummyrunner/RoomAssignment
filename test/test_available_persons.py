@@ -1,10 +1,6 @@
-# This test file is now obsolete due to the rename to available_persons.py
-
 import pytest
 from src.person import Person
-from src.room import Room
-from src.room_config import RoomConfig
-from src.cleaning_candidates import AvailablePersons
+from src.available_persons import AvailablePersons
 import json
 
 
@@ -36,7 +32,6 @@ def test_remove_person_by_full_name():
     person2 = Person("Jane", "Smith")
     candidates.add_person(person1)
     candidates.add_person(person2)
-
     candidates.remove_person_by_full_name("John Doe")
     assert len(candidates.candidates) == 1
     assert candidates.candidates[0].full_name() == "Jane Smith"
@@ -48,7 +43,6 @@ def test_remove_person_by_name():
     person2 = Person("Jane", "Smith")
     candidates.add_person(person1)
     candidates.add_person(person2)
-
     candidates.remove_person_by_name("Jane", "Smith")
     assert len(candidates.candidates) == 1
     assert candidates.candidates[0].full_name() == "John Doe"
@@ -60,13 +54,9 @@ def test_generate_hash():
     person2 = Person("Jane", "Smith")
     candidates.add_person(person1)
     candidates.add_person(person2)
-
     hash1 = candidates.generate_hash()
-
-    # Add in a different order and ensure the hash is the same
     candidates = AvailablePersons([person2, person1])
     hash2 = candidates.generate_hash()
-
     assert hash1 == hash2
 
 
@@ -74,14 +64,10 @@ def test_write_to_file(tmp_path):
     candidates = AvailablePersons()
     candidates.add_person(Person("John", "Doe"))
     candidates.add_person(Person("Jane", "Smith"))
-
     file_path = tmp_path / "candidates.json"
     candidates.write_to_file(file_path)
-
     with open(file_path, "r") as file:
         data = json.load(file)
-
-    # 2 elements and 1 hash
     assert len(data) == 2 + 1
     assert data[0]["first_name"] == "John"
     assert data[0]["last_name"] == "Doe"
@@ -90,12 +76,10 @@ def test_write_to_file(tmp_path):
 
 
 def test_from_csv(tmp_path):
-    # Create a sample CSV file
     csv_content = """John;Doe\nJane;Smith\nAlice;Brown\n"""
     csv_path = tmp_path / "candidates.csv"
     with open(csv_path, "w", encoding="utf-8") as f:
         f.write(csv_content)
-
     candidates = AvailablePersons.from_csv(str(csv_path))
     assert len(candidates.candidates) == 3
     assert candidates.candidates[0].full_name() == "John Doe"
@@ -107,7 +91,6 @@ def test_from_csv_with_test_data():
     csv_path = "test/test_data/test_persons.csv"
     candidates = AvailablePersons.from_csv(csv_path)
     print(candidates.candidates)
-    # Check that candidates were loaded
     assert len(candidates.candidates) > 0
     for person in candidates.candidates:
         assert isinstance(person.first_name, str)

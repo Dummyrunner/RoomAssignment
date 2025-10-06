@@ -1,6 +1,3 @@
-import hashlib
-
-
 class Room:
     def __init__(self, name: str, capacity: int):
         if not isinstance(name, str) or not name.strip():

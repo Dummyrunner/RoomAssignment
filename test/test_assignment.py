@@ -1,13 +1,14 @@
 import pytest
+import json
 from src.assignment import Assignment
-from src.cleaning_candidates import CleaningCandidates
+from src.available_persons import AvailablePersons
 from src.room_config import RoomConfig
 from src.room import Room
 from src.person import Person
 
 
 def test_assignment_valid():
-    candidates = CleaningCandidates([Person("John", "Doe"), Person("Jane", "Smith")])
+    candidates = AvailablePersons([Person("John", "Doe"), Person("Jane", "Smith")])
     room_config = RoomConfig()
     room_config.add_room(Room("Room A", 2))
     room_config.add_room(Room("Room B", 1))
@@ -20,7 +21,7 @@ def test_assignment_valid():
 
 
 def test_assignment_invalid_person():
-    candidates = CleaningCandidates([Person("John", "Doe")])
+    candidates = AvailablePersons([Person("John", "Doe")])
     room_config = RoomConfig()
     room_config.add_room(Room("Room A", 2))
 
@@ -30,7 +31,7 @@ def test_assignment_invalid_person():
 
 
 def test_assignment_invalid_room():
-    candidates = CleaningCandidates([Person("John", "Doe")])
+    candidates = AvailablePersons([Person("John", "Doe")])
     room_config = RoomConfig()
     room_config.add_room(Room("Room A", 2))
 
@@ -40,7 +41,7 @@ def test_assignment_invalid_room():
 
 
 def test_get_room_for_person():
-    candidates = CleaningCandidates([Person("John", "Doe"), Person("Jane", "Smith")])
+    candidates = AvailablePersons([Person("John", "Doe"), Person("Jane", "Smith")])
     room_config = RoomConfig()
     room_config.add_room(Room("Room A", 2))
 
@@ -55,7 +56,7 @@ def test_get_room_for_person():
 
 
 def test_assignment_exceeds_room_capacity():
-    candidates = CleaningCandidates(
+    candidates = AvailablePersons(
         [Person("John", "Doe"), Person("Jane", "Smith"), Person("Alice", "Johnson")]
     )
     room_config = RoomConfig()
@@ -67,3 +68,26 @@ def test_assignment_exceeds_room_capacity():
     assignment.assign(candidates.candidates[2], "Room A")  # Exceeds capacity
 
     assert assignment.valid() is False
+
+
+def test_append_assignment_to_json(tmp_path):
+    json_file = tmp_path / "assignments.json"
+    room_config = RoomConfig()
+    room_config.add_room(Room("Room A", 2))
+    candidates = AvailablePersons([Person("John", "Doe"), Person("Jane", "Smith")])
+    assignment = Assignment(candidates, room_config)
+    assignment.assign(candidates.candidates[0], "Room A")
+    assignment.assign(candidates.candidates[1], "Room A")
+    assignment.append_assignment_to_json(str(json_file))
+    # Check file contents
+    with open(json_file, "r") as f:
+        data = json.load(f)
+    assert isinstance(data, list)
+    assert len(data) == 1
+    assert {d["person"] for d in data[0]} == {"John Doe", "Jane Smith"}
+    assert all(d["room"] == "Room A" for d in data[0])
+    # Append again and check
+    assignment.append_assignment_to_json(str(json_file))
+    with open(json_file, "r") as f:
+        data = json.load(f)
+    assert len(data) == 2

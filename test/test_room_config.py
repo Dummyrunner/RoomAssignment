@@ -78,3 +78,35 @@ def test_read_from_file(tmp_path):
     assert len(config.rooms) == 2
     assert config.rooms[0].name == "Room A"
     assert config.rooms[1].capacity == 5
+
+
+def test_from_csv(tmp_path):
+    # Create a sample CSV file
+    csv_content = """Room A;10\nRoom B;5\nRoom C;8\n"""
+    csv_path = tmp_path / "rooms.csv"
+    with open(csv_path, "w", encoding="utf-8") as f:
+        f.write(csv_content)
+
+    config = RoomConfig.from_csv(str(csv_path))
+    assert len(config.rooms) == 3
+    assert config.rooms[0].name == "Room A"
+    assert config.rooms[0].capacity == 10
+    assert config.rooms[1].name == "Room B"
+    assert config.rooms[1].capacity == 5
+    assert config.rooms[2].name == "Room C"
+    assert config.rooms[2].capacity == 8
+
+
+def test_from_csv_with_test_data():
+    # Prepare test CSV file path
+    csv_path = "test/test_data/test_rooms.csv"
+    config = RoomConfig.from_csv(csv_path)
+    print(config.rooms)
+    # Check that rooms were loaded
+    assert len(config.rooms) > 0
+    # Check that all rooms have valid names and capacities
+    for room in config.rooms:
+        assert isinstance(room.name, str)
+        assert isinstance(room.capacity, int)
+        assert room.name != ""
+        assert room.capacity > 0

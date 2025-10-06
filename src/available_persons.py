@@ -47,7 +47,7 @@ class AvailablePersons:
 
     @staticmethod
     def from_csv(filepath: str):
-        """Factory method to create CleaningCandidates from a CSV file."""
+        """Factory method to create AvailablePersons from a CSV file."""
         candidates = AvailablePersons()
         with open(filepath, newline="", encoding="utf-8") as csvfile:
             reader = csv.reader(csvfile, delimiter=";")

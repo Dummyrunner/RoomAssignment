@@ -1,5 +1,6 @@
 import json
 import hashlib
+import csv
 from src.room import Room
 
 
@@ -43,3 +44,24 @@ class RoomConfig:
         room_data.append({"hash": self.generate_hash()})
         with open(filepath, "w") as file:
             json.dump(room_data, file, indent=4)
+
+    @staticmethod
+    def from_csv(filepath: str):
+        """Factory method to create RoomConfig from a CSV file with ';' as separator."""
+        config = RoomConfig()
+        with open(filepath, newline="", encoding="utf-8") as csvfile:
+            reader = csv.reader(csvfile, delimiter=";")
+            for row in reader:
+                if len(row) < 2:
+                    continue  # skip invalid rows
+                name, capacity = row[0], row[1]
+                try:
+                    capacity = int(capacity)
+                except ValueError:
+                    continue  # skip rows with invalid capacity
+                config.add_room(Room(name, capacity))
+        return config
+
+    def __str__(self):
+        room_list = [f"{room.name}: {room.capacity}" for room in self.rooms]
+        return "RoomConfig: [" + ", ".join(room_list) + "]"

@@ -1,19 +1,31 @@
-from src.cleaning_candidates import CleaningCandidates
+from src.available_persons import AvailablePersons
 from src.room_config import RoomConfig
 from src.person import Person
+import json
 
 
 class Assignment:
-    def __init__(
-        self, cleaning_candidates: CleaningCandidates, room_config: RoomConfig
-    ):
+    def __init__(self, cleaning_candidates: AvailablePersons, room_config: RoomConfig):
         self.cleaning_candidates = cleaning_candidates
         self.room_config = room_config
         self.assignment_map = {}
-
-        # Initialize all persons as unassigned
         for person in cleaning_candidates:
             self.assignment_map[person] = None
+
+        # Initialize all persons as unassigned
+
+    def append_assignment_to_json(self, json_file_path: str):
+        data = []
+        for person, room in self.assignment_map.items():
+            data.append({"person": person.full_name(), "room": room if room else None})
+        try:
+            with open(json_file_path, "r") as f:
+                existing = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            existing = []
+        existing.append(data)
+        with open(json_file_path, "w") as f:
+            json.dump(existing, f, indent=2)
 
     def assign(self, person: Person, room_name: str):
         if room_name not in [room.name for room in self.room_config.rooms]:
@@ -59,3 +71,10 @@ class Assignment:
             return False
 
         return True
+
+    def __str__(self):
+        result = []
+        for person, room in self.assignment_map.items():
+            assigned = room if room else "Unassigned"
+            result.append(f"{person.full_name()} -> {assigned}")
+        return "Assignment: [" + ", ".join(result) + "]"
